@@ -5,6 +5,9 @@
   "references": [
     {
       "path": "./packages/storybook-framework-react-rspack"
+    },
+    {
+      "path": "./packages/storybook-builder-rspack"
     }
   ]
 }
