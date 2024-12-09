@@ -1,5 +1,5 @@
 {
-  "name": "@storybook-rspack/source",
+  "name": "storybook-rspack",
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {},
