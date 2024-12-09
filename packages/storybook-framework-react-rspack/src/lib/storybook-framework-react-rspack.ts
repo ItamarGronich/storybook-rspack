@@ -1,3 +1,3 @@
 export function storybookFrameworkReactRspack(): string {
-  return 'storybook-framework-react-rspack!';
+  return 'storybook-framework-react-rspack';
 }
