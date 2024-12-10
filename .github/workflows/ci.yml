@@ -15,13 +15,16 @@ permissions:
 
 jobs:
   main:
+    name: Continuous Integration
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Repo
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - uses: pnpm/action-setup@v4
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
 
       # This enables task distribution via Nx Cloud
       # Run this command as early as possible, before dependencies are installed
@@ -30,13 +33,17 @@ jobs:
       # - run: pnpm dlx nx-cloud start-ci-run --distribute-on="3 linux-medium-js" --stop-agents-after="build"
 
       # Cache node_modules
-      - uses: actions/setup-node@v4
+      - name: Setup NodeJS
+        uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version-file: '.nvmrc'
           cache: 'pnpm'
 
-      - run: pnpm install --frozen-lockfile
-      - uses: nrwl/nx-set-shas@v4
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Setup Nx base and head
+        uses: nrwl/nx-set-shas@v4
 
       # Prepend any command with "nx-cloud record --" to record its logs to Nx Cloud
       # - run: pnpm exec nx-cloud record -- echo Hello World
