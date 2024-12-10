@@ -1,5 +1,5 @@
 {
-  "name": "storybook-builder-rspack",
+  "name": "@gitamar/storybook-builder-rspack",
   "version": "0.0.1",
   "dependencies": {
     "tslib": "^2.3.0"
