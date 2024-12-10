@@ -4,6 +4,14 @@
   "license": "MIT",
   "scripts": {},
   "private": true,
+  "author": {
+    "name": "Itamar Gronich",
+    "url": "https://github.com/itamargronich"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/itamargronich/storybook-rspack"
+  },
   "devDependencies": {
     "@changesets/cli": "^2.27.10",
     "@eslint/js": "^9.8.0",
