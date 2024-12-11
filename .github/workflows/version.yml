@@ -55,7 +55,7 @@ jobs:
           # This can happen in two cases:
           # 1. This is the initial commit and no changesets were ever generated yet
           # 2. The changeset files were deleted as of merging a release PR.
-          publish: npm whoami
+          publish: pnpm run publish-packages
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

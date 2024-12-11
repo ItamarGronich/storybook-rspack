@@ -2,7 +2,9 @@
   "name": "@gitamar/storybook-rspack",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "publish-packages": "nx run-many --target=build && changeset publish"
+  },
   "private": true,
   "author": {
     "name": "Itamar Gronich",
