@@ -1,11 +1,21 @@
-# storybook-builder-rspack
+# @gitamar/storybook-builder-rspack
 
-This library was generated with [Nx](https://nx.dev).
+This library is a storybook `framework` that uses Rspack and React.
 
-## Building
+to use this first install the package:
 
-Run `nx build storybook-builder-rspack` to build the library.
+```bash
+npm install @gitamar/storybook-builder-rspack
+```
 
-## Running unit tests
+then add it to your storybook config `.storybook/main.js`:
 
-Run `nx test storybook-builder-rspack` to execute the unit tests via [Jest](https://jestjs.io).
+```js
+module.exports = {
+  // ...
+  core: {
+    builder: '@gitamar/storybook-builder-rspack',
+  },
+  // ...
+};
+```

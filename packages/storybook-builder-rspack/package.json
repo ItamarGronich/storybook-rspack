@@ -4,6 +4,12 @@
   "dependencies": {
     "tslib": "^2.3.0"
   },
+  "keywords": [
+    "storybook",
+    "rspack",
+    "react",
+    "framework"
+  ],
   "author": {
     "name": "Itamar Gronich",
     "url": "https://github.com/itamargronich"
