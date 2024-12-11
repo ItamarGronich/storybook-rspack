@@ -8,6 +8,9 @@
     },
     {
       "path": "./packages/storybook-builder-rspack"
+    },
+    {
+      "path": "./packages/storybook-preset-react-rspack"
     }
   ]
 }
