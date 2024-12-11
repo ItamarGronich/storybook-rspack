@@ -8,7 +8,7 @@
     "storybook",
     "rspack",
     "react",
-    "framework"
+    "storybook-framework"
   ],
   "author": {
     "name": "Itamar Gronich",
