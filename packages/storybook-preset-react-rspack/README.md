@@ -1,11 +1,6 @@
-# storybook-preset-react-rspack
+# Storybook Webpack preset for React
 
-This library was generated with [Nx](https://nx.dev).
+This package is a [preset](https://storybook.js.org/docs/react/addons/writing-presets#presets-api) that configures Storybook's webpack settings for handling React.
+It's an internal package that's not intended to be used directly by users.
 
-## Building
-
-Run `nx build storybook-preset-react-rspack` to build the library.
-
-## Running unit tests
-
-Run `nx test storybook-preset-react-rspack` to execute the unit tests via [Jest](https://jestjs.io).
+- More info on [Storybook for React](https://storybook.js.org/docs/react/get-started)

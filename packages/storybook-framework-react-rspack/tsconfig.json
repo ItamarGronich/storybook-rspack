@@ -4,6 +4,12 @@
   "include": [],
   "references": [
     {
+      "path": "../storybook-preset-react-rspack"
+    },
+    {
+      "path": "../storybook-builder-rspack"
+    },
+    {
       "path": "./tsconfig.lib.json"
     },
     {

@@ -1,30 +1,78 @@
 {
   "name": "@gitamar/storybook-framework-react-rspack",
   "version": "0.0.2",
-  "dependencies": {
-    "tslib": "^2.3.0"
-  },
+  "description": "Storybook framework for react built with Rspack",
   "keywords": [
     "storybook",
     "rspack",
     "react",
     "storybook-framework"
   ],
+  "homepage": "https://github.com/itamargronich",
+  "bugs": {
+    "url": "https://github.com/itamargronich"
+  },
   "author": {
     "name": "Itamar Gronich",
     "url": "https://github.com/itamargronich"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/itamargronich/storybook-rspack"
+    "url": "https://github.com/itamargronich/storybook-rspack",
+    "directory": "packages/storybook-framework-react-rspack"
   },
-  "type": "commonjs",
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "node": "./dist/index.js",
+      "require": "./dist/index.js"
+    },
+    "./preset": {
+      "types": "./dist/preset.d.ts",
+      "require": "./dist/preset.js"
+    },
+    "./package.json": "./package.json"
+  },
   "main": "./dist/index.js",
-  "typings": "./dist/index.d.ts",
+  "type": "commonjs",
+  "types": "./dist/index.d.ts",
   "files": [
     "dist",
+    "preset.js",
     "!**/*.tsbuildinfo"
   ],
+  "dependencies": {
+    "@gitamar/storybook-builder-rspack": "workspace:*",
+    "@gitamar/storybook-preset-react-rspack": "workspace:*",
+    "@storybook/react": "7.6.19",
+    "@types/node": "^18.0.0",
+    "tslib": "^2.3.0"
+  },
+  "devDependencies": {
+    "@storybook/types": "7.6.19"
+  },
+  "peerDependencies": {
+    "@babel/core": "^7.22.0",
+    "react": "^16.8.0 || ^17.0.0 || ^18.0.0",
+    "react-dom": "^16.8.0 || ^17.0.0 || ^18.0.0",
+    "storybook": "^7.0.0",
+    "typescript": "*"
+  },
+  "peerDependenciesMeta": {
+    "@babel/core": {
+      "optional": true
+    },
+    "typescript": {
+      "optional": true
+    }
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "nx": {
     "sourceRoot": "packages/storybook-framework-react-rspack/src",
     "projectType": "library",

@@ -9,7 +9,14 @@
     "types": ["node"]
   },
   "include": ["src/**/*.ts"],
-  "references": [],
+  "references": [
+    {
+      "path": "../storybook-preset-react-rspack/tsconfig.lib.json"
+    },
+    {
+      "path": "../storybook-builder-rspack/tsconfig.lib.json"
+    }
+  ],
   "exclude": [
     "vite.config.ts",
     "vite.config.mts",

@@ -2,7 +2,9 @@
 
 This library is a storybook `framework` that uses Rspack and React.
 
-to use this first install the package:
+Builder implemented with `Rspack` and `Rspack`-compatible loaders/plugins/config, used by `@storybook/core-server` to build the preview iframe.
+
+## Usage
 
 ```bash
 npm install @gitamar/storybook-builder-rspack
@@ -11,11 +13,9 @@ npm install @gitamar/storybook-builder-rspack
 then add it to your storybook config `.storybook/main.js`:
 
 ```js
-module.exports = {
-  // ...
+export default {
   core: {
     builder: '@gitamar/storybook-builder-rspack',
   },
-  // ...
 };
 ```

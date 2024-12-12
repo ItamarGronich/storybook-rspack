@@ -1,18 +1,109 @@
 {
   "name": "@gitamar/storybook-preset-react-rspack",
   "version": "0.0.1",
-  "dependencies": {
-    "tslib": "^2.3.0"
+  "description": "Storybook for React built with Rspack",
+  "keywords": [
+    "storybook",
+    "storybook-preset",
+    "react",
+    "rspack"
+  ],
+  "homepage": "https://github.com/itamargronich/storybook-rspack/tree/main/packages/storybook-preset-react-rspack",
+  "bugs": {
+    "url": "https://github.com/itamargronich/storybook-rspack/issues"
+  },
+  "author": {
+    "name": "Itamar Gronich",
+    "url": "https://github.com/itamargronich"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/itamargronich/storybook-rspack.git",
+    "directory": "packages/storybook-preset-react-rspack"
+  },
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "node": "./dist/index.js",
+      "require": "./dist/index.js"
+    },
+    "./preset": {
+      "types": "./dist/index.d.ts",
+      "node": "./dist/index.js",
+      "require": "./dist/index.js"
+    },
+    "./dist/framework-preset-cra": {
+      "types": "./dist/framework-preset-cra.d.ts",
+      "require": "./dist/framework-preset-cra.js"
+    },
+    "./dist/framework-preset-react-docs": {
+      "types": "./dist/framework-preset-react-docs.d.ts",
+      "require": "./dist/framework-preset-react-docs.js"
+    },
+    "./dist/framework-preset-react": {
+      "types": "./dist/framework-preset-react.d.ts",
+      "require": "./dist/framework-preset-react.js"
+    },
+    "./dist/loaders/react-docgen-loader": {
+      "types": "./dist/loaders/react-docgen-loader.d.ts",
+      "require": "./dist/loaders/react-docgen-loader.js"
+    },
+    "./package.json": "./package.json"
   },
   "type": "commonjs",
-  "main": "./dist/index.js",
-  "typings": "./dist/index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "files": [
     "dist",
+    "preset.js",
     "!**/*.tsbuildinfo"
   ],
+  "dependencies": {
+    "@babel/preset-flow": "^7.22.15",
+    "@babel/preset-react": "^7.22.15",
+    "@pmmmwh/react-refresh-webpack-plugin": "^0.5.11",
+    "@storybook/core-webpack": "7.6.19",
+    "@storybook/docs-tools": "7.6.19",
+    "@storybook/node-logger": "7.6.19",
+    "@storybook/react": "7.6.19",
+    "@storybook/react-docgen-typescript-plugin": "1.0.6--canary.9.0c3f3b7.0",
+    "@types/node": "^18.0.0",
+    "@types/semver": "^7.3.4",
+    "babel-plugin-add-react-displayname": "^0.0.5",
+    "fs-extra": "^11.1.0",
+    "magic-string": "^0.30.5",
+    "react-docgen": "^7.0.0",
+    "react-refresh": "^0.14.0",
+    "semver": "^7.3.7",
+    "tslib": "^2.3.0",
+    "webpack": "5"
+  },
+  "peerDependencies": {
+    "@babel/core": "^7.22.0",
+    "react": "^16.8.0 || ^17.0.0 || ^18.0.0",
+    "react-dom": "^16.8.0 || ^17.0.0 || ^18.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@babel/core": {
+      "optional": true
+    },
+    "typescript": {
+      "optional": true
+    }
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "nx": {
+    "name": "storybook-preset-react-rspack",
     "sourceRoot": "packages/storybook-preset-react-rspack/src",
     "projectType": "library"
+  },
+  "devDependencies": {
+    "@types/babel__core": "^7.20.5"
   }
 }
