@@ -55,6 +55,8 @@
   "types": "./dist/index.d.ts",
   "files": [
     "dist",
+    "templates",
+    "*.d.ts",
     "!**/*.tsbuildinfo"
   ],
   "dependencies": {
