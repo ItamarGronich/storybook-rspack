@@ -1,6 +1,6 @@
 {
   "name": "@gitamar/storybook-builder-rspack",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "Storybook builder for Rspack",
   "keywords": [
     "storybook",

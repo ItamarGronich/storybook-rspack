@@ -1,6 +1,6 @@
 {
   "name": "@gitamar/storybook-preset-react-rspack",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Storybook for React built with Rspack",
   "keywords": [
     "storybook",

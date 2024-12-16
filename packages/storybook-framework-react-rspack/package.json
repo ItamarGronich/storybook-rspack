@@ -1,6 +1,6 @@
 {
   "name": "@gitamar/storybook-framework-react-rspack",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "Storybook framework for react built with Rspack",
   "keywords": [
     "storybook",
