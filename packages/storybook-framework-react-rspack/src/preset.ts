@@ -2,8 +2,8 @@ import { dirname, join } from 'path';
 import type { PresetProperty } from '@storybook/types';
 import type { StorybookConfig } from './types';
 
-const getAbsolutePath = <I extends string>(input: I): I =>
-  dirname(require.resolve(join(input, 'package.json'))) as any;
+const getAbsolutePath = (input: string): string =>
+  dirname(require.resolve(join(input, 'package.json')));
 
 export const addons: PresetProperty<'addons', StorybookConfig> = [
   getAbsolutePath('@gitamar/storybook-preset-react-rspack'),

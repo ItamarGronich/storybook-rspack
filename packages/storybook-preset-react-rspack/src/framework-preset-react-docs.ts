@@ -10,10 +10,9 @@ export const webpackFinal: StorybookConfig['webpackFinal'] = async (
 ): Promise<Configuration> => {
   if (!hasDocsOrControls(options)) return config;
 
-  const typescriptOptions = await options.presets.apply<StorybookConfig['typescript']>(
-    'typescript',
-    {} as any
-  );
+  const typescriptOptions = await options.presets.apply<
+    StorybookConfig['typescript']
+  >('typescript', {} as any);
   const debug = options.loglevel === 'debug';
 
   const { reactDocgen, reactDocgenTypescriptOptions } = typescriptOptions || {};
@@ -34,7 +33,7 @@ export const webpackFinal: StorybookConfig['webpackFinal'] = async (
             test: /\.(cjs|mjs|tsx?|jsx?)$/,
             loader: requirer(
               require.resolve,
-              '@storybook/preset-react-webpack/dist/loaders/react-docgen-loader'
+              '@gitamar/storybook-preset-react-rspack/dist/loaders/react-docgen-loader'
             ),
             options: {
               babelOptions,
@@ -47,7 +46,9 @@ export const webpackFinal: StorybookConfig['webpackFinal'] = async (
     };
   }
 
-  const { ReactDocgenTypeScriptPlugin } = await import('@storybook/react-docgen-typescript-plugin');
+  const { ReactDocgenTypeScriptPlugin } = await import(
+    '@storybook/react-docgen-typescript-plugin'
+  );
 
   const babelOptions = await options.presets.apply('babel', {});
 
@@ -61,7 +62,7 @@ export const webpackFinal: StorybookConfig['webpackFinal'] = async (
           test: /\.(cjs|mjs|jsx?)$/,
           loader: requirer(
             require.resolve,
-            '@storybook/preset-react-webpack/dist/loaders/react-docgen-loader'
+            '@gitamar/storybook-preset-react-rspack/dist/loaders/react-docgen-loader'
           ),
           options: {
             babelOptions,

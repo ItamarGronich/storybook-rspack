@@ -38,7 +38,9 @@ export function getReactScriptsPath({ noCache }: { noCache?: boolean } = {}) {
       }
     }
   } catch (e) {
-    logger.warn(`Error occurred during react-scripts package path resolving: ${e}`);
+    logger.warn(
+      `Error occurred during react-scripts package path resolving: ${e}`
+    );
   }
 
   reactScriptsPath = path.join(reactScriptsScriptPath, '../..');
@@ -53,10 +55,12 @@ export function getReactScriptsPath({ noCache }: { noCache?: boolean } = {}) {
 
 export function isReactScriptsInstalled(requiredVersion = '2.0.0') {
   try {
-    // eslint-disable-next-line import/no-dynamic-require,global-require
-    const reactScriptsJson = require(path.join(getReactScriptsPath(), 'package.json'));
+    const reactScriptsJson = require(path.join(
+      getReactScriptsPath(),
+      'package.json'
+    ));
     return !semver.gtr(requiredVersion, reactScriptsJson.version);
-  } catch (e) {
+  } catch {
     return false;
   }
 }

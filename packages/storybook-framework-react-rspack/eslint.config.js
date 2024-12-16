@@ -8,6 +8,14 @@ module.exports = [
       '@nx/dependency-checks': [
         'error',
         {
+          ignoredDependencies: [
+            '@storybook/react',
+            '@babel/core',
+            'react-dom',
+            'storybook',
+            'typescript',
+            'react',
+          ],
           ignoredFiles: [
             '{projectRoot}/eslint.config.{js,cjs,mjs}',
             '{projectRoot}/vite.config.{js,ts,mjs,mts}',

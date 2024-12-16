@@ -1,5 +1,10 @@
 import { dirname, join, resolve } from 'path';
-import { DefinePlugin, HotModuleReplacementPlugin, ProgressPlugin, ProvidePlugin } from 'webpack';
+import {
+  DefinePlugin,
+  HotModuleReplacementPlugin,
+  ProgressPlugin,
+  ProvidePlugin,
+} from 'webpack';
 import type { Configuration } from 'webpack';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 // @ts-expect-error (I removed this on purpose, because it's incorrect)
@@ -97,7 +102,7 @@ export default async (
     presets.apply<DocsOptions>('docs'),
     presets.apply<string[]>('entries', []),
     presets.apply('stories', []),
-    options.cache?.get('modulesCount').catch(() => {}),
+    options.cache?.get('modulesCount').catch(() => undefined),
     options.presets.apply('build'),
   ]);
 
@@ -109,10 +114,14 @@ export default async (
   const builderOptions = await getBuilderOptions<BuilderOptions>(options);
 
   const shouldCheckTs =
-    typescriptOptions.check && !typescriptOptions.skipBabel && !typescriptOptions.skipCompiler;
+    typescriptOptions.check &&
+    !typescriptOptions.skipBabel &&
+    !typescriptOptions.skipCompiler;
   const tsCheckOptions = typescriptOptions.checkOptions || {};
 
-  const cacheConfig = builderOptions.fsCache ? { cache: { type: 'filesystem' as const } } : {};
+  const cacheConfig = builderOptions.fsCache
+    ? { cache: { type: 'filesystem' as const } }
+    : {};
   const lazyCompilationConfig =
     builderOptions.lazyCompilation && !isProd
       ? {
@@ -134,19 +143,22 @@ export default async (
     externals['@storybook/blocks'] = '__STORYBOOK_BLOCKS_EMPTY_MODULE__';
   }
 
-  const { virtualModules: virtualModuleMapping, entries: dynamicEntries } = await getVirtualModules(
-    options
-  );
+  const { virtualModules: virtualModuleMapping, entries: dynamicEntries } =
+    await getVirtualModules(options);
 
   return {
     name: 'preview',
     mode: isProd ? 'production' : 'development',
     bail: isProd,
-    devtool: options.build?.test?.disableSourcemaps ? false : 'cheap-module-source-map',
+    devtool: options.build?.test?.disableSourcemaps
+      ? false
+      : 'cheap-module-source-map',
     entry: [...(entries ?? []), ...dynamicEntries],
     output: {
       path: resolve(process.cwd(), outputDir),
-      filename: isProd ? '[name].[contenthash:8].iframe.bundle.js' : '[name].iframe.bundle.js',
+      filename: isProd
+        ? '[name].[contenthash:8].iframe.bundle.js'
+        : '[name].iframe.bundle.js',
       publicPath: '',
     },
     stats: {
@@ -190,7 +202,9 @@ export default async (
               importPathMatcher: specifier.importPathMatcher.source,
             })),
             DOCS_OPTIONS: docsOptions,
-            ...(build?.test?.disableBlocks ? { __STORYBOOK_BLOCKS_EMPTY_MODULE__: {} } : {}),
+            ...(build?.test?.disableBlocks
+              ? { __STORYBOOK_BLOCKS_EMPTY_MODULE__: {} }
+              : {}),
           },
           headHtmlSnippet,
           bodyHtmlSnippet,
@@ -223,7 +237,9 @@ export default async (
           enforce: 'post',
           use: [
             {
-              loader: require.resolve('@storybook/builder-webpack5/loaders/export-order-loader'),
+              loader: require.resolve(
+                '@gitamar/storybook-builder-rspack/loaders/export-order-loader'
+              ),
             },
           ],
         },
@@ -239,7 +255,11 @@ export default async (
         },
         builderOptions.useSWC
           ? await createSWCLoader(Object.keys(virtualModuleMapping), options)
-          : await createBabelLoader(options, typescriptOptions, Object.keys(virtualModuleMapping)),
+          : await createBabelLoader(
+              options,
+              typescriptOptions,
+              Object.keys(virtualModuleMapping)
+            ),
         {
           test: /\.md$/,
           type: 'asset/source',
@@ -275,7 +295,7 @@ export default async (
       ...(isProd
         ? {
             minimize: true,
-            // eslint-disable-next-line no-nested-ternary
+
             minimizer: options.build?.test?.esbuildMinify
               ? [
                   new TerserWebpackPlugin<EsbuildOptions>({

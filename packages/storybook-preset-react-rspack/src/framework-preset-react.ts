@@ -12,8 +12,13 @@ const getAbsolutePath = <I extends string>(input: I): I =>
 const applyFastRefresh = async (options: Options) => {
   const isDevelopment = options.configType === 'DEVELOPMENT';
   const framework = await options.presets.apply<Preset>('framework');
-  const reactOptions = (typeof framework === 'object' ? framework.options : {}) as ReactOptions;
-  return isDevelopment && (reactOptions.fastRefresh || process.env.FAST_REFRESH === 'true');
+  const reactOptions = (
+    typeof framework === 'object' ? framework.options : {}
+  ) as ReactOptions;
+  return (
+    isDevelopment &&
+    (reactOptions.fastRefresh || process.env.FAST_REFRESH === 'true')
+  );
 };
 
 export const babel: StorybookConfig['babel'] = async (config, options) => {
@@ -27,7 +32,9 @@ export const babel: StorybookConfig['babel'] = async (config, options) => {
     ],
   };
 };
-const storybookReactDirName = getAbsolutePath('@storybook/preset-react-webpack');
+const storybookReactDirName = getAbsolutePath(
+  '@gitamar/storybook-preset-react-rspack'
+);
 // TODO: improve node_modules detection
 const context = storybookReactDirName.includes('node_modules')
   ? join(storybookReactDirName, '../../') // Real life case, already in node_modules
@@ -50,11 +57,17 @@ export const babelDefault: StorybookConfig['babelDefault'] = async (config) => {
       ...(config?.presets || []),
       [require.resolve('@babel/preset-react'), presetReactOptions],
     ],
-    plugins: [...(config?.plugins || []), require.resolve('babel-plugin-add-react-displayname')],
+    plugins: [
+      ...(config?.plugins || []),
+      require.resolve('babel-plugin-add-react-displayname'),
+    ],
   };
 };
 
-export const webpackFinal: StorybookConfig['webpackFinal'] = async (config, options) => {
+export const webpackFinal: StorybookConfig['webpackFinal'] = async (
+  config,
+  options
+) => {
   if (!(await applyFastRefresh(options))) return config;
 
   // matches the name of the plugin in CRA.
@@ -63,7 +76,9 @@ export const webpackFinal: StorybookConfig['webpackFinal'] = async (config, opti
   );
 
   if (hasReactRefresh) {
-    logger.warn("=> React refresh is already set. You don't need to set the option");
+    logger.warn(
+      "=> React refresh is already set. You don't need to set the option"
+    );
     return config;
   }
 

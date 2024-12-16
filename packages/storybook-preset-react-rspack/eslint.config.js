@@ -8,6 +8,12 @@ module.exports = [
       '@nx/dependency-checks': [
         'error',
         {
+          ignoredDependencies: [
+            '@storybook/react',
+            '@babel/preset-flow',
+            'react-dom',
+            'react',
+          ],
           ignoredFiles: ['{projectRoot}/eslint.config.{js,cjs,mjs}'],
         },
       ],

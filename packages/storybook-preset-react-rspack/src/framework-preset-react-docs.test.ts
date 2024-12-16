@@ -4,11 +4,13 @@ import type { Configuration } from 'webpack';
 import * as preset from './framework-preset-react-docs';
 
 jest.mock('./requirer', () => ({
-  requirer: (resolver: any, path: string) => path,
+  requirer: (resolver: never, path: string) => path,
 }));
 
 describe('framework-preset-react-docgen', () => {
-  const presetsListWithDocs = [{ name: '@storybook/addon-docs', options: {}, preset: null }];
+  const presetsListWithDocs = [
+    { name: '@storybook/addon-docs', options: {}, preset: null },
+  ];
 
   // mock requirer
 
@@ -44,8 +46,12 @@ describe('framework-preset-react-docgen', () => {
           rules: [
             {
               exclude: /(\.(stories|story)\.(js|jsx|ts|tsx))|(node_modules)/,
-              loader: '@storybook/preset-react-webpack/dist/loaders/react-docgen-loader',
-              options: { babelOptions: { plugins: [], presets: [] }, debug: false },
+              loader:
+                '@gitamar/storybook-preset-react-rspack/dist/loaders/react-docgen-loader',
+              options: {
+                babelOptions: { plugins: [], presets: [] },
+                debug: false,
+              },
               test: /\.(cjs|mjs|tsx?|jsx?)$/,
             },
           ],
@@ -89,8 +95,12 @@ describe('framework-preset-react-docgen', () => {
           rules: [
             {
               exclude: /(\.(stories|story)\.(js|jsx|ts|tsx))|(node_modules)/,
-              loader: '@storybook/preset-react-webpack/dist/loaders/react-docgen-loader',
-              options: { babelOptions: { plugins: [], presets: [] }, debug: false },
+              loader:
+                '@gitamar/storybook-preset-react-rspack/dist/loaders/react-docgen-loader',
+              options: {
+                babelOptions: { plugins: [], presets: [] },
+                debug: false,
+              },
               test: /\.(cjs|mjs|jsx?)$/,
             },
           ],

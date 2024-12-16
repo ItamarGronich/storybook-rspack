@@ -1,6 +1,7 @@
 import webpackConfig from '../preview/iframe-webpack.config';
 
-export const webpack = async (_: unknown, options: any) => webpackConfig(options);
+export const webpack = async (_: unknown, options: any) =>
+  webpackConfig(options);
 
 export const entries = async (_: unknown, options: any) => {
   let result: string[] = [];
@@ -9,9 +10,9 @@ export const entries = async (_: unknown, options: any) => {
     // Suppress informational messages when --quiet is specified. webpack-hot-middleware's quiet
     // parameter would also suppress warnings.
     result = result.concat(
-      `${require.resolve('webpack-hot-middleware/client')}?reload=true&quiet=false&noInfo=${
-        options.quiet
-      }`
+      `${require.resolve(
+        'webpack-hot-middleware/client'
+      )}?reload=true&quiet=false&noInfo=${options.quiet}`
     );
   }
 
@@ -19,4 +20,4 @@ export const entries = async (_: unknown, options: any) => {
 };
 
 export const previewMainTemplate = () =>
-  require.resolve('@storybook/builder-webpack5/templates/preview.ejs');
+  require.resolve('@gitamar/storybook-builder-rspack/templates/preview.ejs');

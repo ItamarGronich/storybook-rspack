@@ -100,7 +100,10 @@
     "webpack": "5",
     "webpack-dev-middleware": "^6.1.1",
     "webpack-hot-middleware": "^2.25.1",
-    "webpack-virtual-modules": "^0.5.0"
+    "webpack-virtual-modules": "^0.5.0",
+    "@storybook/types": "7.6.19",
+    "pretty-hrtime": "1.0.3",
+    "slash": "3.0.0"
   },
   "devDependencies": {
     "@storybook/types": "7.6.19",
@@ -125,6 +128,13 @@
   "nx": {
     "name": "storybook-builder-rspack",
     "sourceRoot": "packages/storybook-builder-rspack/src",
-    "projectType": "library"
+    "projectType": "library",
+    "targets": {
+      "test": {
+        "options": {
+          "passWithNoTests": true
+        }
+      }
+    }
   }
 }

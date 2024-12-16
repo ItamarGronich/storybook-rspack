@@ -46,11 +46,11 @@
     "@gitamar/storybook-builder-rspack": "workspace:*",
     "@gitamar/storybook-preset-react-rspack": "workspace:*",
     "@storybook/react": "7.6.19",
-    "@types/node": "^18.0.0",
-    "tslib": "^2.3.0"
+    "tslib": "^2.3.0",
+    "@storybook/types": "7.6.19"
   },
   "devDependencies": {
-    "@storybook/types": "7.6.19"
+    "@types/node": "^18.0.0"
   },
   "peerDependencies": {
     "@babel/core": "^7.22.0",
@@ -76,6 +76,7 @@
   "nx": {
     "sourceRoot": "packages/storybook-framework-react-rspack/src",
     "projectType": "library",
+    "name": "storybook-framework-react-rspack",
     "targets": {
       "test": {
         "executor": "@nx/vite:test",
