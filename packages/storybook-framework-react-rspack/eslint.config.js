@@ -9,6 +9,8 @@ module.exports = [
         'error',
         {
           ignoredDependencies: [
+            '@gitamar/storybook-builder-rspack',
+            '@gitamar/storybook-preset-react-rspack',
             '@storybook/react',
             '@babel/core',
             'react-dom',
