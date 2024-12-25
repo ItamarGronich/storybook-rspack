@@ -1,35 +1,23 @@
 import { dirname, join, resolve } from 'path';
-import {
-  DefinePlugin,
-  HotModuleReplacementPlugin,
-  ProgressPlugin,
-  ProvidePlugin,
-} from 'webpack';
-import type { Configuration } from 'webpack';
+import { DefinePlugin, HotModuleReplacementPlugin, ProgressPlugin, ProvidePlugin } from '@rspack/core';
+import { type Configuration, SwcJsMinimizerRspackPlugin } from '@rspack/core';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 // @ts-expect-error (I removed this on purpose, because it's incorrect)
 import CaseSensitivePathsPlugin from 'case-sensitive-paths-webpack-plugin';
 import TerserWebpackPlugin from 'terser-webpack-plugin';
 import VirtualModulePlugin from 'webpack-virtual-modules';
-import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
+import { TsCheckerRspackPlugin } from 'ts-checker-rspack-plugin';
 import type { TransformOptions as EsbuildOptions } from 'esbuild';
-import type { JsMinifyOptions as SwcOptions } from '@swc/core';
 import type { Options, CoreConfig, DocsOptions } from '@storybook/types';
 import { globalsNameReferenceMap } from '@storybook/preview/globals';
-import {
-  getBuilderOptions,
-  stringifyProcessEnvs,
-  normalizeStories,
-  isPreservingSymlinks,
-} from '@storybook/core-common';
+import { getBuilderOptions, stringifyProcessEnvs, normalizeStories, isPreservingSymlinks } from '@storybook/core-common';
 import { type BuilderOptions } from '@storybook/core-webpack';
 import { dedent } from 'ts-dedent';
 import type { TypescriptOptions } from '../types';
-import { createBabelLoader, createSWCLoader } from './loaders';
+import { createSWCLoader } from './loaders';
 import { getVirtualModules } from './virtual-module-mapping';
 
-const getAbsolutePath = <I extends string>(input: I): I =>
-  dirname(require.resolve(join(input, 'package.json'))) as any;
+const getAbsolutePath = <I extends string>(input: I): I => dirname(require.resolve(join(input, 'package.json'))) as any;
 const maybeGetAbsolutePath = <I extends string>(input: I): I | false => {
   try {
     return getAbsolutePath(input);
@@ -44,7 +32,7 @@ const globalPath = maybeGetAbsolutePath(`@storybook/global`);
 const routerPath = maybeGetAbsolutePath(`@storybook/router`);
 const themingPath = maybeGetAbsolutePath(`@storybook/theming`);
 
-// these packages are not pre-bundled because of react dependencies.
+// these packages are not pre-bundled because of React dependencies.
 // these are not dependencies of the builder anymore, thus resolving them can fail.
 // we should remove the aliases in 8.0, I'm not sure why they are here in the first place.
 const storybookPaths: Record<string, string> = {
@@ -61,37 +49,13 @@ const storybookPaths: Record<string, string> = {
   ...(themingPath ? { [`@storybook/theming`]: themingPath } : {}),
 };
 
-export default async (
-  options: Options & { typescriptOptions: TypescriptOptions }
-): Promise<Configuration> => {
-  const {
-    outputDir = join('.', 'public'),
-    quiet,
-    packageJson,
-    configType,
-    presets,
-    previewUrl,
-    typescriptOptions,
-    features,
-  } = options;
+export default async (options: Options & { typescriptOptions: TypescriptOptions }): Promise<Configuration> => {
+  const { outputDir = join('.', 'public'), quiet, packageJson, configType, presets, previewUrl, typescriptOptions, features } = options;
 
   const isProd = configType === 'PRODUCTION';
   const workingDir = process.cwd();
 
-  const [
-    coreOptions,
-    frameworkOptions,
-    envs,
-    logLevel,
-    headHtmlSnippet,
-    bodyHtmlSnippet,
-    template,
-    docsOptions,
-    entries,
-    nonNormalizedStories,
-    modulesCount = 1000,
-    build,
-  ] = await Promise.all([
+  const [coreOptions, frameworkOptions, envs, logLevel, headHtmlSnippet, bodyHtmlSnippet, template, docsOptions, entries, nonNormalizedStories, build] = await Promise.all([
     presets.apply<CoreConfig>('core'),
     presets.apply('frameworkOptions'),
     presets.apply<Record<string, string>>('env'),
@@ -113,15 +77,10 @@ export default async (
 
   const builderOptions = await getBuilderOptions<BuilderOptions>(options);
 
-  const shouldCheckTs =
-    typescriptOptions.check &&
-    !typescriptOptions.skipBabel &&
-    !typescriptOptions.skipCompiler;
+  const shouldCheckTs = typescriptOptions.check && !typescriptOptions.skipBabel && !typescriptOptions.skipCompiler;
   const tsCheckOptions = typescriptOptions.checkOptions || {};
 
-  const cacheConfig = builderOptions.fsCache
-    ? { cache: { type: 'filesystem' as const } }
-    : {};
+  const cacheConfig = { cache: true };
   const lazyCompilationConfig =
     builderOptions.lazyCompilation && !isProd
       ? {
@@ -131,7 +90,7 @@ export default async (
 
   if (!template) {
     throw new Error(dedent`
-      Storybook's Webpack5 builder requires a template to be specified.
+      Storybook's Rspack builder requires a template to be specified.
       Somehow you've ended up with a falsy value for the template option.
 
       Please file an issue at https://github.com/storybookjs/storybook with a reproduction.
@@ -143,22 +102,17 @@ export default async (
     externals['@storybook/blocks'] = '__STORYBOOK_BLOCKS_EMPTY_MODULE__';
   }
 
-  const { virtualModules: virtualModuleMapping, entries: dynamicEntries } =
-    await getVirtualModules(options);
+  const { virtualModules: virtualModuleMapping, entries: dynamicEntries } = await getVirtualModules(options);
 
   return {
     name: 'preview',
     mode: isProd ? 'production' : 'development',
     bail: isProd,
-    devtool: options.build?.test?.disableSourcemaps
-      ? false
-      : 'cheap-module-source-map',
+    devtool: options.build?.test?.disableSourcemaps ? false : 'cheap-module-source-map',
     entry: [...(entries ?? []), ...dynamicEntries],
     output: {
       path: resolve(process.cwd(), outputDir),
-      filename: isProd
-        ? '[name].[contenthash:8].iframe.bundle.js'
-        : '[name].iframe.bundle.js',
+      filename: isProd ? '[name].[contenthash:8].iframe.bundle.js' : '[name].iframe.bundle.js',
       publicPath: '',
     },
     stats: {
@@ -169,18 +123,9 @@ export default async (
       ignored: /node_modules/,
     },
     externals,
-    ignoreWarnings: [
-      {
-        message: /export '\S+' was not found in 'global'/,
-      },
-      {
-        message: /export '\S+' was not found in '@storybook\/global'/,
-      },
-    ],
+    ignoreWarnings: [error => /export '\S+' was not found in 'global'/.test(error.message), error => /export '\S+' was not found in '@storybook\/global'/.test(error.message)],
     plugins: [
-      Object.keys(virtualModuleMapping).length > 0
-        ? new VirtualModulePlugin(virtualModuleMapping)
-        : (null as any),
+      Object.keys(virtualModuleMapping).length > 0 ? new VirtualModulePlugin(virtualModuleMapping) : (null as any),
       new HtmlWebpackPlugin({
         filename: `iframe.html`,
         // FIXME: `none` isn't a known option
@@ -189,7 +134,7 @@ export default async (
         inject: false,
         template,
         templateParameters: {
-          version: packageJson.version,
+          version: packageJson.version!,
           globals: {
             CONFIG_TYPE: configType,
             LOGLEVEL: logLevel,
@@ -197,14 +142,12 @@ export default async (
             CHANNEL_OPTIONS: coreOptions.channelOptions,
             FEATURES: features,
             PREVIEW_URL: previewUrl,
-            STORIES: stories.map((specifier) => ({
+            STORIES: stories.map(specifier => ({
               ...specifier,
               importPathMatcher: specifier.importPathMatcher.source,
             })),
             DOCS_OPTIONS: docsOptions,
-            ...(build?.test?.disableBlocks
-              ? { __STORYBOOK_BLOCKS_EMPTY_MODULE__: {} }
-              : {}),
+            ...(build?.test?.disableBlocks ? { __STORYBOOK_BLOCKS_EMPTY_MODULE__: {} } : {}),
           },
           headHtmlSnippet,
           bodyHtmlSnippet,
@@ -225,21 +168,17 @@ export default async (
       new ProvidePlugin({ process: require.resolve('process/browser.js') }),
       isProd ? null : new HotModuleReplacementPlugin(),
       new CaseSensitivePathsPlugin(),
-      quiet ? null : new ProgressPlugin({ modulesCount }),
-      shouldCheckTs ? new ForkTsCheckerWebpackPlugin(tsCheckOptions) : null,
+      quiet ? null : new ProgressPlugin(),
+      shouldCheckTs ? new TsCheckerRspackPlugin(tsCheckOptions) : null,
     ].filter(Boolean),
     module: {
-      // Disable warning for dynamic requires
-      unknownContextCritical: false,
       rules: [
         {
           test: /\.stories\.([tj])sx?$|(stories|story)\.mdx$/,
           enforce: 'post',
           use: [
             {
-              loader: require.resolve(
-                '@gitamar/storybook-builder-rspack/loaders/export-order-loader'
-              ),
+              loader: require.resolve('@gitamar/storybook-builder-rspack/loaders/export-order-loader'),
             },
           ],
         },
@@ -253,13 +192,7 @@ export default async (
             fullySpecified: false,
           },
         },
-        builderOptions.useSWC
-          ? await createSWCLoader(Object.keys(virtualModuleMapping), options)
-          : await createBabelLoader(
-              options,
-              typescriptOptions,
-              Object.keys(virtualModuleMapping)
-            ),
+        await createSWCLoader(Object.keys(virtualModuleMapping), options),
         {
           test: /\.md$/,
           type: 'asset/source',
@@ -280,7 +213,7 @@ export default async (
         fs: false,
         constants: require.resolve('constants-browserify'),
       },
-      // Set webpack to resolve symlinks based on whether the user has asked node to.
+      // Set rspack to resolve symlinks based on whether the user has asked node to.
       // This feels like it should be default out-of-the-box in webpack :shrug:
       symlinks: !isPreservingSymlinks(),
     },
@@ -307,24 +240,13 @@ export default async (
                     },
                   }),
                 ]
-              : builderOptions.useSWC
-              ? [
-                  new TerserWebpackPlugin<SwcOptions>({
-                    minify: TerserWebpackPlugin.swcMinify,
-                    terserOptions: {
-                      sourceMap: !options.build?.test?.disableSourcemaps,
-                      mangle: false,
-                      keep_fnames: true,
-                    },
-                  }),
-                ]
               : [
-                  new TerserWebpackPlugin({
-                    parallel: true,
-                    terserOptions: {
-                      sourceMap: !options.build?.test?.disableSourcemaps,
+                  new SwcJsMinimizerRspackPlugin({
+                    minimizerOptions: {
                       mangle: false,
-                      keep_fnames: true,
+                      compress: {
+                        keep_fnames: true,
+                      },
                     },
                   }),
                 ],

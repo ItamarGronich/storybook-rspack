@@ -62,7 +62,8 @@
   "dependencies": {
     "@babel/preset-flow": "^7.22.15",
     "@babel/preset-react": "^7.22.15",
-    "@pmmmwh/react-refresh-webpack-plugin": "^0.5.11",
+    "@rspack/core": "1.1.6",
+    "@rspack/plugin-react-refresh": "1.1.0",
     "@storybook/core-webpack": "7.6.19",
     "@storybook/docs-tools": "7.6.19",
     "@storybook/node-logger": "7.6.19",
@@ -73,8 +74,7 @@
     "react-docgen": "^7.0.0",
     "react-refresh": "^0.14.0",
     "semver": "^7.3.7",
-    "tslib": "^2.3.0",
-    "webpack": "5"
+    "tslib": "^2.3.0"
   },
   "devDependencies": {
     "@types/babel__core": "^7.20.5",

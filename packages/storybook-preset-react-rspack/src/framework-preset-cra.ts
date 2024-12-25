@@ -1,4 +1,5 @@
 import { logger } from '@storybook/node-logger';
+import { type Configuration as RspackConfiguration } from '@rspack/core';
 import type { Preset, StorybookConfig } from '@storybook/core-webpack';
 import { isReactScriptsInstalled } from './cra-config';
 
@@ -10,14 +11,12 @@ const checkForNewPreset = (presetsList: Preset[]) => {
 
   if (!hasNewPreset) {
     logger.warn('Storybook support for Create React App is now a separate preset.');
-    logger.warn(
-      'To use the new preset, install `@storybook/preset-create-react-app` and add it to the list of `addons` in your `.storybook/main.js` config file.'
-    );
+    logger.warn('To use the new preset, install `@storybook/preset-create-react-app` and add it to the list of `addons` in your `.storybook/main.js` config file.');
     logger.warn('The built-in preset has been disabled in Storybook 6.0.');
   }
 };
 
-export const webpackFinal: StorybookConfig['webpack'] = (config, { presetsList }) => {
+export const rspackFinal: StorybookConfig<RspackConfiguration>['webpack'] = (config, { presetsList }) => {
   if (isReactScriptsInstalled()) {
     if (presetsList) {
       checkForNewPreset(presetsList);
@@ -35,7 +34,7 @@ export const webpackFinal: StorybookConfig['webpack'] = (config, { presetsList }
           fullySpecified: false,
         },
       },
-    ]
+    ],
   );
   return config;
 };

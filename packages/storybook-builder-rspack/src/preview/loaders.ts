@@ -3,32 +3,8 @@ import type { Options as SwcOptions } from '@swc/core';
 import { dedent } from 'ts-dedent';
 import { logger } from '@storybook/node-logger';
 import type { Options } from '@storybook/types';
-import type { TypescriptOptions } from '../types';
 
-export const createBabelLoader = async (
-  options: Options & { typescriptOptions: TypescriptOptions },
-  typescriptOptions: TypescriptOptions,
-  excludes: string[] = []
-) => {
-  logger.info(dedent`Using Babel compiler`);
-  const babelOptions = await options.presets.apply('babel', {}, options);
-  return {
-    test: typescriptOptions.skipBabel ? /\.(mjs|jsx?)$/ : /\.(mjs|tsx?|jsx?)$/,
-    use: [
-      {
-        loader: require.resolve('babel-loader'),
-        options: babelOptions,
-      },
-    ],
-    include: [getProjectRoot()],
-    exclude: [/node_modules/, ...excludes],
-  };
-};
-
-export const createSWCLoader = async (
-  excludes: string[] = [],
-  options: Options
-) => {
+export const createSWCLoader = async (excludes: string[] = [], options: Options) => {
   logger.info(dedent`Using SWC compiler`);
 
   const swc = await options.presets.apply('swc', {}, options);
@@ -49,10 +25,8 @@ export const createSWCLoader = async (
     },
   };
   return {
-    test: typescriptOptions.skipCompiler
-      ? /\.(mjs|cjs|jsx?)$/
-      : /\.(mjs|cjs|tsx?|jsx?)$/,
-    loader: require.resolve('swc-loader'),
+    test: typescriptOptions.skipCompiler ? /\.(mjs|cjs|jsx?)$/ : /\.(mjs|cjs|tsx?|jsx?)$/,
+    loader: 'builtin:swc-loader',
     options: config,
     include: [getProjectRoot()],
     exclude: [/node_modules/, ...excludes],

@@ -6,7 +6,7 @@ import { parse as parseCjs, init as initCjsParser } from 'cjs-module-lexer';
 // despite it being compiled to both esm and cjs
 import { parse as parseEs } from 'es-module-lexer';
 import MagicString from 'magic-string';
-import type { LoaderContext } from 'webpack';
+import type { LoaderContext } from '@rspack/core';
 
 export default async function loader(
   this: LoaderContext<any>,

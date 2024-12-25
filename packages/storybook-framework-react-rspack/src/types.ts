@@ -1,13 +1,5 @@
-import type {
-  ReactOptions,
-  StorybookConfig as StorybookConfigBase,
-  TypescriptOptions as TypescriptOptionsReact,
-} from '@gitamar/storybook-preset-react-rspack';
-import type {
-  StorybookConfigWebpack,
-  BuilderOptions,
-  TypescriptOptions as TypescriptOptionsBuilder,
-} from '@gitamar/storybook-builder-rspack';
+import type { ReactOptions, StorybookConfig as StorybookConfigBase, TypescriptOptions as TypescriptOptionsReact } from '@gitamar/storybook-preset-react-rspack';
+import type { StorybookConfigRspack, BuilderOptions, TypescriptOptions as TypescriptOptionsBuilder } from '@gitamar/storybook-builder-rspack';
 
 type FrameworkName = '@gitamar/storybook-framework-react-rspack';
 type BuilderName = '@gitamar/storybook-builder-rspack';
@@ -31,16 +23,10 @@ type StorybookConfigFramework = {
           options: BuilderOptions;
         };
   };
-  typescript?: Partial<TypescriptOptionsBuilder & TypescriptOptionsReact> &
-    StorybookConfigBase['typescript'];
+  typescript?: Partial<TypescriptOptionsBuilder & TypescriptOptionsReact> & StorybookConfigBase['typescript'];
 };
 
 /**
  * The interface for Storybook configuration in `main.ts` files.
  */
-export type StorybookConfig = Omit<
-  StorybookConfigBase,
-  keyof StorybookConfigWebpack | keyof StorybookConfigFramework
-> &
-  StorybookConfigWebpack &
-  StorybookConfigFramework;
+export type StorybookConfig = Omit<StorybookConfigBase, keyof StorybookConfigRspack | keyof StorybookConfigFramework> & StorybookConfigRspack & StorybookConfigFramework;

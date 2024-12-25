@@ -1,24 +1,13 @@
 import { logger } from '@storybook/node-logger';
 import type { Options } from '@storybook/types';
-import type { Configuration } from 'webpack';
+import type { Configuration } from '@rspack/core';
 
-export async function createDefaultWebpackConfig(
-  storybookBaseConfig: Configuration,
-  options: Options
-): Promise<Configuration> {
-  if (
-    options.presetsList?.some((preset) =>
-      /@storybook(\/|\\)preset-create-react-app/.test(
-        typeof preset === 'string' ? preset : preset.name
-      )
-    )
-  ) {
+export async function createDefaultRspackConfig(storybookBaseConfig: Configuration, options: Options): Promise<Configuration> {
+  if (options.presetsList?.some(preset => /@storybook(\/|\\)preset-create-react-app/.test(typeof preset === 'string' ? preset : preset.name))) {
     return storybookBaseConfig;
   }
 
-  const hasPostcssAddon = options.presetsList?.some((preset) =>
-    /@storybook(\/|\\)addon-postcss/.test(typeof preset === 'string' ? preset : preset.name)
-  );
+  const hasPostcssAddon = options.presetsList?.some(preset => /@storybook(\/|\\)addon-postcss/.test(typeof preset === 'string' ? preset : preset.name));
 
   let cssLoaders = {};
   if (!hasPostcssAddon) {
@@ -29,7 +18,7 @@ export async function createDefaultWebpackConfig(
       use: [
         // TODO: Decide if we want to keep style-loader & css-loader in core
         // Trying to apply style-loader or css-loader to files that already have been
-        // processed by them causes webpack to crash, so no one else can add similar
+        // processed by them causes rspack to crash, so no one else can add similar
         // loader configurations to the `.css` extension.
         require.resolve('style-loader'),
         {
@@ -55,9 +44,7 @@ export async function createDefaultWebpackConfig(
           test: /\.(svg|ico|jpg|jpeg|png|apng|gif|eot|otf|webp|ttf|woff|woff2|cur|ani|pdf)(\?.*)?$/,
           type: 'asset/resource',
           generator: {
-            filename: isProd
-              ? 'static/media/[name].[contenthash:8][ext]'
-              : 'static/media/[path][name][ext]',
+            filename: isProd ? 'static/media/[name].[contenthash:8][ext]' : 'static/media/[path][name][ext]',
           },
         },
         {
@@ -69,9 +56,7 @@ export async function createDefaultWebpackConfig(
             },
           },
           generator: {
-            filename: isProd
-              ? 'static/media/[name].[contenthash:8][ext]'
-              : 'static/media/[path][name][ext]',
+            filename: isProd ? 'static/media/[name].[contenthash:8][ext]' : 'static/media/[path][name][ext]',
           },
         },
         {

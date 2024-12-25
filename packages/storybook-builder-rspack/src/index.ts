@@ -1,86 +1,62 @@
-import type { Stats, Configuration, StatsOptions } from 'webpack';
-import webpack, { ProgressPlugin } from 'webpack';
+import rspack, { type Configuration, ProgressPlugin, type Stats, type StatsOptions } from '@rspack/core';
 import webpackDevMiddleware from 'webpack-dev-middleware';
 import webpackHotMiddleware from 'webpack-hot-middleware';
 import { logger } from '@storybook/node-logger';
 import type { Builder, Options } from '@storybook/types';
-import { checkWebpackVersion } from '@storybook/core-webpack';
 import { dirname, join, parse } from 'path';
 import express from 'express';
 import fs from 'fs-extra';
 import { PREVIEW_BUILDER_PROGRESS } from '@storybook/core-events';
-import {
-  WebpackCompilationError,
-  WebpackInvocationError,
-  WebpackMissingStatsError,
-} from '@storybook/core-events/server-errors';
+import { WebpackCompilationError, WebpackInvocationError, WebpackMissingStatsError } from '@storybook/core-events/server-errors';
 
 import prettyTime from 'pretty-hrtime';
 
 export * from './types';
 export * from './preview/virtual-module-mapping';
 
-export const printDuration = (startTime: [number, number]) =>
-  prettyTime(process.hrtime(startTime))
-    .replace(' ms', ' milliseconds')
-    .replace(' s', ' seconds')
-    .replace(' m', ' minutes');
+export const printDuration = (startTime: [number, number]) => prettyTime(process.hrtime(startTime)).replace(' ms', ' milliseconds').replace(' s', ' seconds').replace(' m', ' minutes');
 
-const getAbsolutePath = <I extends string>(input: I): I =>
-  dirname(require.resolve(join(input, 'package.json'))) as any;
+const getAbsolutePath = <I extends string>(input: I): I => dirname(require.resolve(join(input, 'package.json'))) as any;
 
 let compilation: ReturnType<typeof webpackDevMiddleware> | undefined;
 let reject: (reason?: any) => void;
 
-type WebpackBuilder = Builder<Configuration, Stats>;
+type RspackBuilder = Builder<Configuration, Stats>;
 type Unpromise<T extends Promise<any>> = T extends Promise<infer U> ? U : never;
 
-type BuilderStartOptions = Parameters<WebpackBuilder['start']>['0'];
-type BuilderStartResult = Unpromise<ReturnType<WebpackBuilder['start']>>;
-type StarterFunction = (
-  options: BuilderStartOptions
-) => AsyncGenerator<unknown, BuilderStartResult, void>;
+type BuilderStartOptions = Parameters<RspackBuilder['start']>['0'];
+type BuilderStartResult = Unpromise<ReturnType<RspackBuilder['start']>>;
+type StarterFunction = (options: BuilderStartOptions) => AsyncGenerator<unknown, BuilderStartResult, void>;
 
-type BuilderBuildOptions = Parameters<WebpackBuilder['build']>['0'];
-type BuilderBuildResult = Unpromise<ReturnType<WebpackBuilder['build']>>;
-type BuilderFunction = (
-  options: BuilderBuildOptions
-) => AsyncGenerator<Stats | undefined, BuilderBuildResult, void>;
+type BuilderBuildOptions = Parameters<RspackBuilder['build']>['0'];
+type BuilderBuildResult = Unpromise<ReturnType<RspackBuilder['build']>>;
+type BuilderFunction = (options: BuilderBuildOptions) => AsyncGenerator<Stats | undefined, BuilderBuildResult, void>;
 
 export const executor = {
   get: async (options: Options) => {
-    const version = ((await options.presets.apply('webpackVersion')) ||
-      '5') as string;
-    const webpackInstance =
-      (
-        await options.presets.apply<{ default: typeof webpack }>(
-          'webpackInstance'
-        )
-      )?.default || webpack;
-    checkWebpackVersion({ version }, '5', 'builder-webpack5');
-    return webpackInstance;
+    return (await options.presets.apply<{ default: typeof rspack }>('rspackInstance'))?.default || rspack;
   },
 };
 
-export const getConfig: WebpackBuilder['getConfig'] = async (options) => {
+export const getConfig: RspackBuilder['getConfig'] = async options => {
   const { presets } = options;
   const typescriptOptions = await presets.apply('typescript', {}, options);
   const frameworkOptions = await presets.apply<any>('frameworkOptions');
 
   return presets.apply(
-    'webpack',
+    'rspack',
     {},
     {
       ...options,
       typescriptOptions,
       frameworkOptions,
-    }
+    },
   ) as any;
 };
 
 let asyncIterator: ReturnType<StarterFunction> | ReturnType<BuilderFunction>;
 
-export const bail: WebpackBuilder['bail'] = async () => {
+export const bail: RspackBuilder['bail'] = async () => {
   if (asyncIterator) {
     try {
       // we tell the builder (that started) to stop ASAP and wait
@@ -115,13 +91,8 @@ export const bail: WebpackBuilder['bail'] = async () => {
  *
  * I am sorry for making you read about generators today :')
  */
-const starter: StarterFunction = async function* starterGeneratorFn({
-  startTime,
-  options,
-  router,
-  channel,
-}) {
-  const webpackInstance = await executor.get(options);
+const starter: StarterFunction = async function* starterGeneratorFn({ startTime, options, router, channel }) {
+  const rspackInstance = await executor.get(options);
   yield;
 
   const config = await getConfig(options);
@@ -131,51 +102,32 @@ const starter: StarterFunction = async function* starterGeneratorFn({
   }
   yield;
 
-  const compiler = webpackInstance(config);
+  const compiler = rspackInstance(config);
 
   if (!compiler) {
     throw new WebpackInvocationError({
-      error: new Error(`Missing Webpack compiler at runtime!`),
+      error: new Error(`Missing Rspack compiler at runtime!`),
     });
   }
 
   yield;
-  const modulesCount =
-    (await options.cache?.get('modulesCount').catch(() => undefined)) || 1000;
-  let totalModules: number;
+
   let value = 0;
 
-  new ProgressPlugin({
-    handler: (newValue, message, arg3) => {
-      value = Math.max(newValue, value); // never go backwards
-      const progress = {
-        value,
-        message: message.charAt(0).toUpperCase() + message.slice(1),
-      };
-      if (message === 'building') {
-        // arg3 undefined in webpack5
-        const counts = (arg3 && arg3.match(/(\d+)\/(\d+)/)) || [];
-        const complete = parseInt(counts[1], 10);
-        const total = parseInt(counts[2], 10);
-        if (!Number.isNaN(complete) && !Number.isNaN(total)) {
-          (progress as any).modules = { complete, total };
-          totalModules = total;
-        }
+  new ProgressPlugin((newValue, message) => {
+    value = Math.max(newValue, value); // never go backwards
+    const progress = {
+      value,
+      message: message.charAt(0).toUpperCase() + message.slice(1),
+    };
+
+    if (value === 1) {
+      if (!progress.message) {
+        progress.message = `Completed in ${printDuration(startTime)}.`;
       }
+    }
 
-      if (value === 1) {
-        if (options.cache) {
-          options.cache.set('modulesCount', totalModules);
-        }
-
-        if (!progress.message) {
-          progress.message = `Completed in ${printDuration(startTime)}.`;
-        }
-      }
-
-      channel.emit(PREVIEW_BUILDER_PROGRESS, progress);
-    },
-    modulesCount,
+    channel.emit(PREVIEW_BUILDER_PROGRESS, progress);
   }).apply(compiler);
 
   const middlewareOptions: Parameters<typeof webpackDevMiddleware>[1] = {
@@ -184,17 +136,16 @@ const starter: StarterFunction = async function* starterGeneratorFn({
     stats: 'errors-only',
   };
 
-  compilation = webpackDevMiddleware(compiler, middlewareOptions);
+  // @ts-expect-error (rspack compiler and webpack compiler don't line up perfectly but this should work 😅)
+  const compilation = webpackDevMiddleware(compiler, middlewareOptions);
 
   const previewResolvedDir = getAbsolutePath('@storybook/preview');
   const previewDirOrigin = join(previewResolvedDir, 'dist');
 
-  router.use(
-    `/sb-preview`,
-    express.static(previewDirOrigin, { immutable: true, maxAge: '5m' })
-  );
+  router.use(`/sb-preview`, express.static(previewDirOrigin, { immutable: true, maxAge: '5m' }));
 
   router.use(compilation);
+  // @ts-expect-error (rspack compiler and webpack compiler don't line up perfectly but this should work 😅)
   router.use(webpackHotMiddleware(compiler, { log: false }));
 
   const stats = await new Promise<Stats>((res, rej) => {
@@ -207,10 +158,10 @@ const starter: StarterFunction = async function* starterGeneratorFn({
     throw new WebpackMissingStatsError();
   }
 
-  const { warnings, errors } = getWebpackStats({ config, stats });
+  const { warnings, errors } = getRspackStats({ config, stats });
 
   if (warnings.length > 0) {
-    warnings?.forEach((e) => logger.warn(e.message));
+    warnings?.forEach(e => logger.warn(e.message));
   }
 
   if (errors.length > 0) {
@@ -224,13 +175,7 @@ const starter: StarterFunction = async function* starterGeneratorFn({
   };
 };
 
-function getWebpackStats({
-  config,
-  stats,
-}: {
-  config: Configuration;
-  stats: Stats;
-}) {
+function getRspackStats({ config, stats }: { config: Configuration; stats: Stats }) {
   const statsOptions =
     typeof config.stats === 'string'
       ? config.stats
@@ -252,11 +197,8 @@ function getWebpackStats({
  *
  * I am sorry for making you read about generators today :')
  */
-const builder: BuilderFunction = async function* builderGeneratorFn({
-  startTime,
-  options,
-}) {
-  const webpackInstance = await executor.get(options);
+const builder: BuilderFunction = async function* builderGeneratorFn({ startTime, options }) {
+  const rspackInstance = await executor.get(options);
   yield;
   const config = await getConfig(options);
 
@@ -265,15 +207,15 @@ const builder: BuilderFunction = async function* builderGeneratorFn({
   }
   yield;
 
-  const compiler = webpackInstance(config);
+  const compiler = rspackInstance(config);
 
   if (!compiler) {
     throw new WebpackInvocationError({
-      error: new Error(`Missing Webpack compiler at runtime!`),
+      error: new Error(`Missing Rspack compiler at runtime!`),
     });
   }
 
-  const webpackCompilation = new Promise<Stats>((succeed, fail) => {
+  const rspackCompilation = new Promise<Stats>((succeed, fail) => {
     compiler.run((error, stats) => {
       if (error) {
         compiler.close(() => fail(new WebpackInvocationError({ error })));
@@ -284,19 +226,19 @@ const builder: BuilderFunction = async function* builderGeneratorFn({
         throw new WebpackMissingStatsError();
       }
 
-      const { warnings, errors } = getWebpackStats({ config, stats });
+      const { warnings, errors } = getRspackStats({ config, stats });
 
       if (warnings.length > 0) {
-        warnings?.forEach((e) => logger.warn(e.message));
+        warnings?.forEach(e => logger.warn(e.message));
       }
 
       if (errors.length > 0) {
-        errors.forEach((e) => logger.error(e.message));
+        errors.forEach(e => logger.error(e.message));
         compiler.close(() => fail(new WebpackCompilationError({ errors })));
         return;
       }
 
-      compiler.close((closeErr) => {
+      compiler.close(closeErr => {
         if (closeErr) {
           return fail(new WebpackInvocationError({ error: closeErr }));
         }
@@ -311,7 +253,7 @@ const builder: BuilderFunction = async function* builderGeneratorFn({
   const previewDirTarget = join(options.outputDir || '', `sb-preview`);
 
   const previewFiles = fs.copy(previewDirOrigin, previewDirTarget, {
-    filter: (src) => {
+    filter: src => {
       const { ext } = parse(src);
       if (ext) {
         return ext === '.js';
@@ -320,12 +262,9 @@ const builder: BuilderFunction = async function* builderGeneratorFn({
     },
   });
 
-  const [webpackCompilationOutput] = await Promise.all([
-    webpackCompilation,
-    previewFiles,
-  ]);
+  const [rspackCompilationOutput] = await Promise.all([rspackCompilation, previewFiles]);
 
-  return webpackCompilationOutput;
+  return rspackCompilationOutput;
 };
 
 export const start = async (options: BuilderStartOptions) => {
@@ -351,6 +290,4 @@ export const build = async (options: BuilderStartOptions) => {
 };
 
 export const corePresets = [join(__dirname, 'presets/preview-preset.js')];
-export const overridePresets = [
-  join(__dirname, './presets/custom-webpack-preset.js'),
-];
+export const overridePresets = [join(__dirname, './presets/custom-rspack-preset.js')];

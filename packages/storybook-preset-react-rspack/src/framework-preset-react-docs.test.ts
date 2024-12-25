@@ -1,6 +1,6 @@
 import ReactDocgenTypescriptPlugin from '@storybook/react-docgen-typescript-plugin';
 import type { TypescriptOptions } from '@storybook/core-webpack';
-import type { Configuration } from 'webpack';
+import type { Configuration } from '@rspack/core';
 import * as preset from './framework-preset-react-docs';
 
 jest.mock('./requirer', () => ({
@@ -8,17 +8,15 @@ jest.mock('./requirer', () => ({
 }));
 
 describe('framework-preset-react-docgen', () => {
-  const presetsListWithDocs = [
-    { name: '@storybook/addon-docs', options: {}, preset: null },
-  ];
+  const presetsListWithDocs = [{ name: '@storybook/addon-docs', options: {}, preset: null }];
 
   // mock requirer
 
   describe('react-docgen', () => {
-    it('should return the webpack config with the extra webpack loader', async () => {
-      const webpackConfig: Configuration = {};
+    it('should return the rspack config with the extra rspack loader', async () => {
+      const rspackConfig: Configuration = {};
 
-      const config = await preset.webpackFinal?.(webpackConfig, {
+      const config = await preset.rspackFinal?.(rspackConfig, {
         presets: {
           apply: async (name: string) => {
             if (name === 'typescript') {
@@ -46,8 +44,7 @@ describe('framework-preset-react-docgen', () => {
           rules: [
             {
               exclude: /(\.(stories|story)\.(js|jsx|ts|tsx))|(node_modules)/,
-              loader:
-                '@gitamar/storybook-preset-react-rspack/dist/loaders/react-docgen-loader',
+              loader: '@gitamar/storybook-preset-react-rspack/dist/loaders/react-docgen-loader',
               options: {
                 babelOptions: { plugins: [], presets: [] },
                 debug: false,
@@ -61,12 +58,12 @@ describe('framework-preset-react-docgen', () => {
   });
 
   describe('react-docgen-typescript', () => {
-    it('should return the webpack config with the extra plugin', async () => {
-      const webpackConfig = {
+    it('should return the rspack config with the extra plugin', async () => {
+      const rspackConfig = {
         plugins: [],
       };
 
-      const config = await preset.webpackFinal?.(webpackConfig, {
+      const config = await preset.rspackFinal?.(rspackConfig, {
         presets: {
           // @ts-expect-error (not strict)
           apply: async (name: string) => {
@@ -95,8 +92,7 @@ describe('framework-preset-react-docgen', () => {
           rules: [
             {
               exclude: /(\.(stories|story)\.(js|jsx|ts|tsx))|(node_modules)/,
-              loader:
-                '@gitamar/storybook-preset-react-rspack/dist/loaders/react-docgen-loader',
+              loader: '@gitamar/storybook-preset-react-rspack/dist/loaders/react-docgen-loader',
               options: {
                 babelOptions: { plugins: [], presets: [] },
                 debug: false,
@@ -112,11 +108,11 @@ describe('framework-preset-react-docgen', () => {
 
   describe('no docgen', () => {
     it('should not add any extra plugins', async () => {
-      const webpackConfig = {
+      const rspackConfig = {
         plugins: [],
       };
 
-      const outputWebpackconfig = await preset.webpackFinal?.(webpackConfig, {
+      const outputRspackconfig = await preset.rspackFinal?.(rspackConfig, {
         presets: {
           // @ts-expect-error (Converted from ts-ignore)
           apply: async () =>
@@ -128,17 +124,17 @@ describe('framework-preset-react-docgen', () => {
         presetsList: presetsListWithDocs,
       });
 
-      expect(outputWebpackconfig).toEqual({ plugins: [] });
+      expect(outputRspackconfig).toEqual({ plugins: [] });
     });
   });
 
   describe('no docs or controls addon used', () => {
     it('should not add any extra plugins', async () => {
-      const webpackConfig = {
+      const rspackConfig = {
         plugins: [],
       };
 
-      const outputWebpackconfig = await preset.webpackFinal?.(webpackConfig, {
+      const outputRspackconfig = await preset.rspackFinal?.(rspackConfig, {
         presets: {
           // @ts-expect-error (Converted from ts-ignore)
           apply: async () =>
@@ -150,7 +146,7 @@ describe('framework-preset-react-docgen', () => {
         presetsList: [],
       });
 
-      expect(outputWebpackconfig).toEqual({
+      expect(outputRspackconfig).toEqual({
         plugins: [],
       });
     });

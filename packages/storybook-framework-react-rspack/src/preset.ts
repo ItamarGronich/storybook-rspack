@@ -2,12 +2,9 @@ import { dirname, join } from 'path';
 import type { PresetProperty } from '@storybook/types';
 import type { StorybookConfig } from './types';
 
-const getAbsolutePath = (input: string): string =>
-  dirname(require.resolve(join(input, 'package.json')));
+const getAbsolutePath = (input: string): string => dirname(require.resolve(join(input, 'package.json')));
 
-export const addons: PresetProperty<'addons', StorybookConfig> = [
-  getAbsolutePath('@gitamar/storybook-preset-react-rspack'),
-];
+export const addons: PresetProperty<'addons', StorybookConfig> = [getAbsolutePath('@gitamar/storybook-preset-react-rspack')];
 
 export const core: PresetProperty<'core'> = async (config, options) => {
   const framework = await options.presets.apply('framework');
@@ -16,14 +13,13 @@ export const core: PresetProperty<'core'> = async (config, options) => {
     ...config,
     builder: {
       name: getAbsolutePath('@gitamar/storybook-builder-rspack'),
-      options:
-        typeof framework === 'string' ? {} : framework.options.builder || {},
+      options: typeof framework === 'string' ? {} : framework.options.builder || {},
     },
     renderer: getAbsolutePath('@storybook/react'),
   };
 };
 
-export const webpack: StorybookConfig['webpack'] = async (config) => {
+export const rspack: StorybookConfig['rspack'] = async config => {
   config.resolve = config.resolve || {};
 
   config.resolve.alias = {

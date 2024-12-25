@@ -29,10 +29,10 @@
       "require": "./dist/index.js",
       "import": "./dist/index.mjs"
     },
-    "./presets/custom-webpack-preset": {
-      "types": "./dist/presets/custom-webpack-preset.d.ts",
-      "node": "./dist/presets/custom-webpack-preset.js",
-      "require": "./dist/presets/custom-webpack-preset.js"
+    "./presets/custom-rspack-preset": {
+      "types": "./dist/presets/custom-rspack-preset.d.ts",
+      "node": "./dist/presets/custom-rspack-preset.js",
+      "require": "./dist/presets/custom-rspack-preset.js"
     },
     "./presets/preview-preset": {
       "types": "./dist/presets/preview-preset.d.ts",
@@ -61,6 +61,7 @@
   ],
   "dependencies": {
     "@babel/core": "^7.23.2",
+    "@rspack/core": "^1.0.0",
     "@storybook/channels": "7.6.19",
     "@storybook/client-logger": "7.6.19",
     "@storybook/core-common": "7.6.19",
@@ -69,11 +70,11 @@
     "@storybook/node-logger": "7.6.19",
     "@storybook/preview": "7.6.19",
     "@storybook/preview-api": "7.6.19",
+    "@storybook/types": "7.6.19",
     "@swc/core": "1.3.82",
     "@types/babel__core": "^7.20.5",
     "@types/node": "^18.0.0",
     "@types/semver": "^7.3.4",
-    "babel-loader": "^9.0.0",
     "browser-assert": "^1.2.1",
     "case-sensitive-paths-webpack-plugin": "^2.4.0",
     "cjs-module-lexer": "^1.2.3",
@@ -82,28 +83,25 @@
     "es-module-lexer": "^1.4.1",
     "esbuild": "^0.24.0",
     "express": "^4.17.3",
-    "fork-ts-checker-webpack-plugin": "^8.0.0",
     "fs-extra": "^11.1.0",
     "html-webpack-plugin": "^5.5.0",
     "magic-string": "^0.30.5",
     "path-browserify": "^1.0.1",
+    "pretty-hrtime": "1.0.3",
     "process": "^0.11.10",
     "semver": "^7.3.7",
+    "slash": "3.0.0",
     "style-loader": "^3.3.1",
-    "swc-loader": "^0.2.3",
     "terser-webpack-plugin": "^5.3.1",
+    "ts-checker-rspack-plugin": "^1.1.0",
     "ts-dedent": "^2.0.0",
     "tslib": "^2.3.0",
     "url": "^0.11.0",
     "util": "^0.12.4",
     "util-deprecate": "^1.0.2",
-    "webpack": "5",
     "webpack-dev-middleware": "^6.1.1",
     "webpack-hot-middleware": "^2.25.1",
-    "webpack-virtual-modules": "^0.5.0",
-    "@storybook/types": "7.6.19",
-    "pretty-hrtime": "1.0.3",
-    "slash": "3.0.0"
+    "webpack-virtual-modules": "^0.5.0"
   },
   "devDependencies": {
     "@storybook/types": "7.6.19",

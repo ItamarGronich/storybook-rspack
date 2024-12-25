@@ -1,18 +1,12 @@
 import { hasDocsOrControls } from '@storybook/docs-tools';
-
-import type { Configuration } from 'webpack';
+import type { Configuration } from '@rspack/core';
 import type { StorybookConfig } from './types';
 import { requirer } from './requirer';
 
-export const webpackFinal: StorybookConfig['webpackFinal'] = async (
-  config,
-  options
-): Promise<Configuration> => {
+export const rspackFinal: StorybookConfig['rspackFinal'] = async (config, options): Promise<Configuration> => {
   if (!hasDocsOrControls(options)) return config;
 
-  const typescriptOptions = await options.presets.apply<
-    StorybookConfig['typescript']
-  >('typescript', {} as any);
+  const typescriptOptions = await options.presets.apply<StorybookConfig['typescript']>('typescript', {} as any);
   const debug = options.loglevel === 'debug';
 
   const { reactDocgen, reactDocgenTypescriptOptions } = typescriptOptions || {};
@@ -31,10 +25,7 @@ export const webpackFinal: StorybookConfig['webpackFinal'] = async (
           ...(config.module?.rules ?? []),
           {
             test: /\.(cjs|mjs|tsx?|jsx?)$/,
-            loader: requirer(
-              require.resolve,
-              '@gitamar/storybook-preset-react-rspack/dist/loaders/react-docgen-loader'
-            ),
+            loader: requirer(require.resolve, '@gitamar/storybook-preset-react-rspack/dist/loaders/react-docgen-loader'),
             options: {
               babelOptions,
               debug,
@@ -46,9 +37,7 @@ export const webpackFinal: StorybookConfig['webpackFinal'] = async (
     };
   }
 
-  const { ReactDocgenTypeScriptPlugin } = await import(
-    '@storybook/react-docgen-typescript-plugin'
-  );
+  const { ReactDocgenTypeScriptPlugin } = await import('@storybook/react-docgen-typescript-plugin');
 
   const babelOptions = await options.presets.apply('babel', {});
 
@@ -60,10 +49,7 @@ export const webpackFinal: StorybookConfig['webpackFinal'] = async (
         ...(config.module?.rules ?? []),
         {
           test: /\.(cjs|mjs|jsx?)$/,
-          loader: requirer(
-            require.resolve,
-            '@gitamar/storybook-preset-react-rspack/dist/loaders/react-docgen-loader'
-          ),
+          loader: requirer(require.resolve, '@gitamar/storybook-preset-react-rspack/dist/loaders/react-docgen-loader'),
           options: {
             babelOptions,
             debug,
